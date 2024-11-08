@@ -45,4 +45,6 @@ public class TaskController {
         var list = service.findAll();
         return new ResponseEntity<List<TaskDto>>(list, HttpStatus.OK);
     }
+
+    // TODO: findByTitle
 }
