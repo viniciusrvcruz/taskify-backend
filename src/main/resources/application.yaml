@@ -3,3 +3,11 @@ server:
 spring:
   application:
     name: Taskify
+  datasource:
+    url: jdbc:postgresql://localhost:5433/taskify
+    username: postgres
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+      show-sql: true
