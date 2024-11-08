@@ -17,7 +17,7 @@ public class ChecklistDto {
     private String title;
     private String description;
 
-    private Boolean is_checked;
-    private Date checked_at;
+    private Boolean isChecked;
+    private Date checkedAt;
     private TaskModel task;
 }

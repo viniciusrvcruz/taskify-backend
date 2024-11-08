@@ -25,11 +25,11 @@ public class ChecklistModel {
     @Column(length = 200, nullable = true)
     private String description;
 
-    @Column(nullable = false)
-    private Boolean is_checked;
+    @Column(name = "is_checked", nullable = false)
+    private Boolean isChecked;
 
-    @Column(nullable = true)
-    private Date checked_at;
+    @Column(name = "checked_at", nullable = true)
+    private Date checkedAt;
 
     @ManyToOne
     @JoinColumn(name = "task_id")
