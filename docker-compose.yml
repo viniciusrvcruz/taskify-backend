@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+  postgres:
+    image: bitnami/postgresql:latest
+    ports:
+      - '5433:5432'
+    environment:
+      - POSTGRES_USER=postgres
+      - ALLOW_EMPTY_PASSWORD=yes
+      - POSTGRES_DB=taskify
+    volumes:
+      - taskify_pg_data:/bitnami/postgresql
+
+volumes:
+  taskify_pg_data:
