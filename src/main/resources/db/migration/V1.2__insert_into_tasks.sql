@@ -1,0 +1,11 @@
+INSERT INTO tasks (title, description) VALUES
+    ('Task 1', 'Description for task 1'),
+    ('Task 2', 'Description for task 2'),
+    ('Task 3', 'Description for task 3'),
+    ('Task 4', 'Description for task 4'),
+    ('Task 5', 'Description for task 5'),
+    ('Task 6', 'Description for task 6'),
+    ('Task 7', 'Description for task 7'),
+    ('Task 8', 'Description for task 8'),
+    ('Task 9', 'Description for task 9'),
+    ('Task 10', 'Description for task 10');
