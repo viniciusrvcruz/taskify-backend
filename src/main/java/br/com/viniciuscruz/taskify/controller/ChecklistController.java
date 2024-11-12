@@ -9,6 +9,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.LinkRelation;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +46,7 @@ public class ChecklistController {
     )
     public ResponseEntity<ChecklistDto> create(@RequestBody ChecklistDto checklistDto) {
         ChecklistDto checklist = service.create(checklistDto);
+        this.buildSelfLink(checklist);
         return new ResponseEntity<>(checklist, HttpStatus.CREATED);
     }
 
@@ -53,6 +63,7 @@ public class ChecklistController {
     })
     public ResponseEntity<ChecklistDto> findById(@PathVariable(name = "id") long id) {
         ChecklistDto checklist = service.findById(id);
+        this.buildSelfLink(checklist);
         return new ResponseEntity<>(checklist, HttpStatus.OK);
     }
 
@@ -68,6 +79,7 @@ public class ChecklistController {
     )
     public ResponseEntity<ChecklistDto> update(@RequestBody ChecklistDto checklistDto) {
         ChecklistDto checklist = service.update(checklistDto);
+        this.buildSelfLink(checklist);
         return new ResponseEntity<>(checklist, HttpStatus.OK);
     }
 
@@ -93,8 +105,44 @@ public class ChecklistController {
                     @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
             }
     )
-    public ResponseEntity<List<ChecklistDto>> findAll(){
-        var checklists = service.findAll();
-        return new ResponseEntity<>(checklists, HttpStatus.OK);
+    public ResponseEntity<PagedModel<ChecklistDto>> findAll(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "direction", defaultValue = "asc") String direction,
+            PagedResourcesAssembler<ChecklistDto> assembler
+    ) {
+        var sortDirection = "desc".equalsIgnoreCase(direction)
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "title"));
+        Page<ChecklistDto> checklists = service.findAll(pageable);
+
+        PagedModel<ChecklistDto> pagedChecklists = assembler.toModel(checklists, checklistDto -> {
+            buildSelfLink(checklistDto);
+            return checklistDto;
+        });
+
+        return new ResponseEntity<>(pagedChecklists, HttpStatus.OK);
+    }
+
+    private void buildSelfLink(ChecklistDto checklistDto) {
+        checklistDto.add(
+                WebMvcLinkBuilder.linkTo(
+                        WebMvcLinkBuilder.methodOn(
+                                this.getClass()
+                        ).findById(checklistDto.getId())
+                ).withSelfRel()
+        );
+    }
+
+    private void buildCollectionLink(CollectionModel<ChecklistDto> checklists) {
+        checklists.add(
+                WebMvcLinkBuilder.linkTo(
+                        WebMvcLinkBuilder.methodOn(
+                                this.getClass()
+                        ).findAll(0, 10, "asc", null)
+                ).withRel(LinkRelation.of("COLLECTION"))
+        );
     }
 }

@@ -7,6 +7,8 @@ import br.com.viniciuscruz.taskify.model.ChecklistModel;
 import br.com.viniciuscruz.taskify.model.TaskModel;
 import br.com.viniciuscruz.taskify.repository.ChecklistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -57,9 +59,8 @@ public class ChecklistService {
         repository.delete(checklistModel);
     }
 
-    // TODO: Page<CustomerDto> findAll
-    public List<ChecklistDto> findAll() {
-        var list = repository.findAll();
-        return CustomModelMapper.parseObjectList(list, ChecklistDto.class);
+    public Page<ChecklistDto> findAll(Pageable pageable) {
+        var checklists = repository.findAll(pageable);
+        return checklists.map(c -> CustomModelMapper.parseObject(c, ChecklistDto.class));
     }
 }
