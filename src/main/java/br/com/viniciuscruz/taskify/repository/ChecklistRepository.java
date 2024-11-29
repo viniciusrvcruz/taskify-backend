@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ChecklistRepository extends JpaRepository<ChecklistModel, Long> {
     public Page<ChecklistModel> findAll(Pageable pageable);
+
+    public Page<ChecklistModel> findByTaskId(Pageable pageable, long taskId);
 }
