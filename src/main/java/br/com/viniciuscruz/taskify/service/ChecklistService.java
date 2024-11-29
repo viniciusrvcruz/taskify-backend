@@ -7,6 +7,8 @@ import br.com.viniciuscruz.taskify.model.ChecklistModel;
 import br.com.viniciuscruz.taskify.model.TaskModel;
 import br.com.viniciuscruz.taskify.repository.ChecklistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -41,11 +43,16 @@ public class ChecklistService {
         checklistModel.setDescription(checklistDto.getDescription());
         checklistModel.setIsChecked(checklistDto.getIsChecked());
 
-        if (checklistDto.getIsChecked()) {
+        if (checklistDto.getIsChecked() && (checklistDto.getIsChecked() != checklistModel.getIsChecked())) {
             checklistModel.setCheckedAt(new Date());  // Set date
         }
 
-        checklistModel.setTask(CustomModelMapper.parseObject(checklistDto.getTask(), TaskModel.class));
+        if (checklistDto.getTask() != null) {
+            checklistModel.setTask(CustomModelMapper.parseObject(checklistDto.getTask(), TaskModel.class));
+        } else {
+            checklistModel.setTask(null);
+        }
+
         return CustomModelMapper.parseObject(repository.save(checklistModel), ChecklistDto.class);
     }
 
@@ -57,9 +64,13 @@ public class ChecklistService {
         repository.delete(checklistModel);
     }
 
-    // TODO: Page<CustomerDto> findAll
-    public List<ChecklistDto> findAll() {
-        var list = repository.findAll();
-        return CustomModelMapper.parseObjectList(list, ChecklistDto.class);
+    public Page<ChecklistDto> findAll(Pageable pageable) {
+        var checklists = repository.findAll(pageable);
+        return checklists.map(c -> CustomModelMapper.parseObject(c, ChecklistDto.class));
+    }
+
+    public Page<ChecklistDto> findByTaskId(Pageable pageable, long taskId) {
+        var checklists = repository.findByTaskId(pageable, taskId);
+        return checklists.map(c -> CustomModelMapper.parseObject(c, ChecklistDto.class));
     }
 }

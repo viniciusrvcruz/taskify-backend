@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.util.Date;
 
@@ -12,7 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Setter
 @Getter
-public class ChecklistDto {
+public class ChecklistDto extends RepresentationModel<ChecklistDto> {
     private long id;
     private String title;
     private String description;

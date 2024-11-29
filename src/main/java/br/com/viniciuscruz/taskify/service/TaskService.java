@@ -6,6 +6,8 @@ import br.com.viniciuscruz.taskify.mapper.CustomModelMapper;
 import br.com.viniciuscruz.taskify.model.TaskModel;
 import br.com.viniciuscruz.taskify.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,13 +49,13 @@ public class TaskService {
         repository.delete(found);
     }
 
-    public List<TaskDto> findAll() {
-        var list = repository.findAll();
-        return CustomModelMapper.parseObjectList(list, TaskDto.class);
+    public Page<TaskDto> findAll(Pageable pageable) {
+        var tasks = repository.findAll(pageable);
+        return tasks.map(t -> CustomModelMapper.parseObject(t, TaskDto.class));
     }
 
-    public List<TaskDto> findByTitle(String title) {
-        var tasks = repository.findByTitleContainsIgnoreCaseOrderByTitle(title);
-        return CustomModelMapper.parseObjectList(tasks, TaskDto.class);
+    public Page<TaskDto> findByTitle(String title, Pageable pageable) {
+        var tasks = repository.findByTitleContainsIgnoreCaseOrderByTitle(title, pageable);
+        return tasks.map(t -> CustomModelMapper.parseObject(t, TaskDto.class));
     }
 }
